@@ -30,6 +30,7 @@ RSpec.describe 'Iyzipay' do
     begin
       $stdout.puts card.inspect
       card = JSON.parse(card)
+      $stdout.puts card
       expect(card['status']).to eq('success')
       expect(card['locale']).to eq('tr')
       expect(card['systemTime']).not_to be_nil
@@ -39,7 +40,7 @@ RSpec.describe 'Iyzipay' do
       expect(card['cardUserKey']).to eq(card['cardUserKey'])
       expect(card['cardToken']).to eq(card['cardToken'])
       expect(card['cardAlias']).to eq('card alias')
-      expect(card['binNumber']).to eq('552879')
+      expect(card['binNumber']).to eq('55287900')
       expect(card['cardType']).to eq('CREDIT_CARD')
       expect(card['cardAssociation']).to eq('MASTER_CARD')
       expect(card['cardFamily']).to eq('Paraf')
@@ -81,7 +82,7 @@ RSpec.describe 'Iyzipay' do
       expect(card['cardUserKey']).to eq(card['cardUserKey'])
       expect(card['cardToken']).to eq(card['cardToken'])
       expect(card['cardAlias']).to eq('card alias')
-      expect(card['binNumber']).to eq('552879')
+      expect(card['binNumber']).to eq('55287900')
       expect(card['cardType']).to eq('CREDIT_CARD')
       expect(card['cardAssociation']).to eq('MASTER_CARD')
       expect(card['cardFamily']).to eq('Paraf')
@@ -105,7 +106,6 @@ RSpec.describe 'Iyzipay' do
     }
     card = Iyzipay::Model::Card.new.delete(request, @options)
     begin
-      $stdout.puts card.inspect
       card = JSON.parse(card)
       expect(card['status']).to eq('success')
       expect(card['locale']).to eq('tr')
@@ -129,6 +129,7 @@ RSpec.describe 'Iyzipay' do
     begin
       $stdout.puts card_list.inspect
       card_list = JSON.parse(card_list)
+      $stdout.puts card_list
       expect(card_list['status']).to eq('success')
       expect(card_list['locale']).to eq('tr')
       expect(card_list['systemTime']).not_to be_nil
