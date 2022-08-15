@@ -183,8 +183,8 @@ RSpec.describe 'Iyzipay' do
     }
     payment = Iyzipay::Model::Payment.new.create(request, @options)
     begin
-      $stdout.puts payment.inspect
       payment = JSON.parse(payment)
+      $stdout.puts payment
       expect(payment['status']).to eq('success')
       expect(payment['locale']).to eq('tr')
       expect(payment['systemTime']).not_to be_nil
@@ -273,6 +273,7 @@ RSpec.describe 'Iyzipay' do
     begin
       $stdout.puts payment.inspect
       payment = JSON.parse(payment)
+      $stdout.puts payment
       expect(payment['status']).to eq('success')
       expect(payment['locale']).to eq('tr')
       expect(payment['systemTime']).not_to be_nil
