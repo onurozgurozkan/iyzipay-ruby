@@ -4,7 +4,8 @@ module Iyzipay
 
       def create(request = {}, options)
         pki_string = to_pki_string(request)
-        HttpClient.post("#{options.base_url}/payment/iyziconnect/initialize3ds/preauth", get_http_header(pki_string, options), request.to_json)
+        request_path = "/payment/iyziconnect/initialize3ds/preauth"
+        HttpClient.post("#{options.base_url}#{request_path}", get_http_header(request_path, pki_string, options), request.to_json)
       end
 
       def to_pki_string(request)

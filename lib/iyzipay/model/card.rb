@@ -2,14 +2,17 @@ module Iyzipay
   module Model
     class Card < IyzipayResource
 
+      REQUEST_PATH =  "/cardstorage/card"
+
       def create(request = {}, options)
         pki_string = to_pki_string_create(request)
-        HttpClient.post("#{options.base_url}/cardstorage/card", get_http_header(pki_string, options), request.to_json)
+        
+        HttpClient.post("#{options.base_url}#{REQUEST_PATH}", get_http_header(REQUEST_PATH, pki_string, options), request.to_json)
       end
 
       def delete(request = {}, options)
         pki_string = to_pki_string_delete(request)
-        HttpClient.delete("#{options.base_url}/cardstorage/card", get_http_header(pki_string, options), request.to_json)
+        HttpClient.delete("#{options.base_url}#{REQUEST_PATH}", get_http_header(REQUEST_PATH, pki_string, options), request.to_json)
       end
 
       def to_pki_string_create(request)
