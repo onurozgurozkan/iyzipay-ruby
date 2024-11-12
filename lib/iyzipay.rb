@@ -4,6 +4,7 @@
 require 'json'
 require 'rest-client'
 require 'base64'
+require 'openssl'
 
 module Iyzipay
 end

@@ -3,18 +3,19 @@ module Iyzipay
 
     AUTHORIZATION_HEADER_NAME = 'Authorization'
     RANDOM_HEADER_NAME = 'x-iyzi-rnd';
-    AUTHORIZATION_HEADER_STRING = 'IYZWS %s:%s'
+    AUTHORIZATION_HEADER_STRING = 'IYZWSv2 %s'
     RANDOM_STRING_SIZE = 8
     RANDOM_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
-    def get_http_header(pki_string = nil, options = nil, authorize_request = true)
+    def get_http_header(request_path, pki_string = nil, options = nil, authorize_request = true)
       header = {:accept => 'application/json',
                 :'content-type' => 'application/json'}
 
       if authorize_request
-        random_header_value = random_string(RANDOM_STRING_SIZE)
-        header[:'Authorization'] = "#{prepare_authorization_string(pki_string, random_header_value, options)}"
-        header[:'x-iyzi-rnd'] = "#{random_header_value}"
+        random_key = random_string(RANDOM_STRING_SIZE)
+        authorization = prepare_authorization_string(request_path, pki_string, random_key, options)
+        header[:'Authorization'] = authorization
+        header[:'x-iyzi-rnd'] = "#{random_key}"
         header[:'x-iyzi-client-version'] = 'iyzipay-ruby-1.0.45'
       end
 
@@ -25,9 +26,11 @@ module Iyzipay
       get_http_header(nil, false)
     end
 
-    def prepare_authorization_string(pki_string, random_header_value, options)
-      hash_digest = calculate_hash(pki_string, random_header_value, options)
-      format_header_string(options.api_key, hash_digest)
+    def prepare_authorization_string(request_path, pki_string, random_key, options)
+      encrypted_data = calculate_hash(request_path, pki_string, random_key, options)
+      authorization_string = "apiKey:#{options.api_key}&randomKey:#{random_key}&signature:#{encrypted_data}"
+      base64_encoded = Base64.strict_encode64(authorization_string)
+      format_header_string(base64_encoded)
     end
 
     def json_decode(response, raw_result)
@@ -35,8 +38,15 @@ module Iyzipay
       response.from_json(json_result)
     end
 
-    def calculate_hash(pki_string, random_header_value, options)
-      Digest::SHA1.base64digest("#{options.api_key}#{random_header_value}#{options.secret_key}#{pki_string}")
+    def calculate_hash(request_path, pki_string, random_key, options)
+      # payload: randomKey + uri.path + request_body
+      payload = if pki_string.nil?
+                 "#{random_key}#{request_path}"
+               else
+                 "#{random_key}#{request_path}#{pki_string}"
+               end
+
+      OpenSSL::HMAC.hexdigest('SHA256', options.secret_key, payload)
     end
 
     def format_header_string(*args)
